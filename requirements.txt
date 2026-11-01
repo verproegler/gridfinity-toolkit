@@ -1,0 +1,5 @@
+numpy>=1.26
+manifold3d>=3.0
+Pillow>=10.0
+pyopengltk>=0.0.3
+PyOpenGL>=3.1

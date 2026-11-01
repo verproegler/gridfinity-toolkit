@@ -1,0 +1,15 @@
+# user data
+projects/
+output/
+logs/
+settings.json
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# build
+build/
+dist/
