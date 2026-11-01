@@ -2,6 +2,10 @@
 
 *[English version](README.md)*
 
+> **Hinweis: Dieses Projekt ist „vibe coded“.** Es ist großteils mit einem KI-Assistenten (Claude)
+> entstanden und durch Drucken getestet, nicht durch eine formale Testsuite. Bei mir funktioniert
+> es gut – prüfe die Ergebnisse trotzdem im Slicer, bevor du druckst. Nutzung auf eigene Gefahr.
+
 Ein Desktop-Programm für [Gridfinity](https://gridfinity.xyz/)-Ordnungssysteme, das dich von der
 leeren Schublade bis zu fertig belegten Druckplatten bringt:
 
@@ -37,6 +41,21 @@ darauf bleibst.
 ---
 
 ## Installation
+
+### Windows: fertiges Programm (ohne Python)
+
+1. `Gridfinity-Toolkit-<Version>-windows.zip` aus dem [neuesten Release](https://github.com/verproegler/gridfinity-toolkit/releases/latest) herunterladen.
+2. Irgendwohin entpacken (z. B. `Dokumente\Gridfinity Toolkit`).
+3. Im entpackten Ordner `Gridfinity Toolkit.exe` starten.
+
+Projekte, Exporte, Logs und Einstellungen landen **neben der .exe** (`projects/`, `output/`,
+`logs/`, `settings.json`) – lege den Ordner also dorthin, wo du schreiben darfst. Zum
+Aktualisieren die neue Version über den alten Ordner entpacken; deine Daten bleiben erhalten.
+
+Windows SmartScreen warnt beim ersten Start eventuell, weil das Programm nicht signiert ist:
+**Weitere Informationen → Trotzdem ausführen**.
+
+### Aus dem Quellcode (alle Systeme, Python)
 
 Du brauchst **Python 3.10 oder neuer** (getestet mit Python 3.14 unter Windows 11).
 

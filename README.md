@@ -2,6 +2,10 @@
 
 *[Deutsche Anleitung](README.de.md)*
 
+> **Disclaimer: this project is vibe coded.** It was written largely with an AI assistant
+> (Claude) and tested by printing, not by a formal test suite. It works well for me, but check the
+> results in your slicer before printing, and use it at your own risk.
+
 A desktop tool for [Gridfinity](https://gridfinity.xyz/) storage that takes you from an empty
 drawer to ready-to-print plates:
 
@@ -36,6 +40,21 @@ choice is remembered). Every field and button has a short explanation – just r
 ---
 
 ## Installation
+
+### Windows: ready-to-run program (no Python needed)
+
+1. Download `Gridfinity-Toolkit-<version>-windows.zip` from the [latest release](https://github.com/verproegler/gridfinity-toolkit/releases/latest).
+2. Unzip it anywhere (e.g. `Documents\Gridfinity Toolkit`).
+3. Start `Gridfinity Toolkit.exe` in the unzipped folder.
+
+Your projects, exports, logs and settings are created **next to the .exe** (`projects/`,
+`output/`, `logs/`, `settings.json`), so keep the folder somewhere you can write to. To update,
+unzip the new version over the old folder; your data stays.
+
+Windows SmartScreen may warn on the first start because the program is not signed: click
+**More info → Run anyway**.
+
+### From source (any system, Python)
 
 You need **Python 3.10 or newer** (tested with Python 3.14 on Windows 11).
 
@@ -358,6 +377,13 @@ e.g. `bambu_template_Bambu_Lab_A1.config`). The printer must also be listed in `
 **Adding a language:** add a dictionary like `DE` in `i18n.py` and register it in `LANGUAGES`
 and `TABLES`.
 
+**Building the Windows program:** run `packaging\build_exe.bat`. It installs PyInstaller and
+writes `dist\Gridfinity Toolkit\Gridfinity Toolkit.exe` (a folder with the .exe and `_internal`;
+zip the whole folder for a release). In the built program the assets come from the bundle and the
+user data is kept next to the .exe (`paths.py`).
+
+Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+
 ---
 
 ## License and credits
@@ -371,5 +397,6 @@ Gridfinity Toolkit is released under the [MIT license](LICENSE).
   texts are in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 - `assets/bambu_template_*.config` are printer settings exported from Bambu Studio (AGPL-3.0);
   they are not covered by the MIT license of this project.
-- Python packages used at runtime (installed via `requirements.txt`, not included here): numpy,
-  manifold3d, Pillow, PyOpenGL, pyopengltk – see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+- Python packages used at runtime (installed via `requirements.txt`, not included in the source):
+  numpy, manifold3d, Pillow, PyOpenGL, pyopengltk – see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+  The Windows download bundles Python and these packages; their licenses apply to those parts.

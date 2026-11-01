@@ -30,6 +30,7 @@ TYPE_COLORS = ["#2563eb", "#f59e0b", "#16a34a", "#9333ea", "#0d9488", "#db2777",
                "#475569", "#65a30d", "#ea580c"]
 RED = "#dc2626"
 DIM_GREY = "#d9dde3"   # 3D view: bins on other levels
+DIM_ALPHA = 0.2        # their opacity, so the bins below/inside stay visible
 DEFAULT_STYLE = {"h": 6.0, "fill": "solid", "lip": True, "wall": 0.8, "hex_size": 7.0, "hex_web": 3.0,
                  "hex_floor": False, "base": "lite", "magnets": False, **binlib.STYLE_DEFAULTS}
 PART_KEYS = STYLE_KEYS + ("front",)   # what makes two parts identical (front: see bins.build_bin_cells)
@@ -502,11 +503,13 @@ class Scene:
     def build(self, p, bins, level, highlight=(), dim_others=False):
         """Returns (v, f, colour per triangle, line segments, line colours).
         highlight: bins drawn in a lighter colour (selection).
-        dim_others: bins not starting on 'level' are greyed out (warnings stay faintly red)."""
+        dim_others: bins not starting on 'level' are greyed out and see-through (warnings stay faintly
+        red); the colours then get a 4th column with the opacity 0..1."""
         parts = []
 
-        def add(v, f, col):
-            parts.append((v, f, np.tile(hex_rgb(col, log), (len(f), 1))))
+        def add(v, f, col, alpha=1.0):
+            rgb = hex_rgb(col, log) + ([alpha] if dim_others else [])
+            parts.append((v, f, np.tile(np.array(rgb, dtype=float), (len(f), 1))))
 
         xe, ye = edges(p)
         ph, seat = plate_height(p.get("style", "thin")), seat_height(p.get("style", "thin"))
@@ -524,10 +527,11 @@ class Scene:
             col = RED if level_role(b, level) == "blocked" or not supported(bins, b) else b["color"]
             if any(b is h for h in highlight):
                 col = "#facc15"
-            elif dim_others and abs(b["z"] - level) > EPS:
+            dim = dim_others and abs(b["z"] - level) > EPS and not any(b is h for h in highlight)
+            if dim:
                 col = mix(col, DIM_GREY, 0.55 if col == RED else 0.8)
             v, f = self.part(key_w, part_style(b["style"], k))
-            add(v @ m[:3] + m[3], f, col)
+            add(v @ m[:3] + m[3], f, col, DIM_ALPHA if dim else 1.0)
         # grid of the current level; above the floor at the height of the lip top
         zl = seat + level * binlib.UNIT_H + (binlib.FOOT_TOP + 0.05 if level < EPS else binlib.LIP_TOP + 0.05)
         segs = [[[x, ye[0], zl], [x, ye[-1], zl]] for x in xe] + [[[xe[0], y, zl], [xe[-1], y, zl]] for y in ye]

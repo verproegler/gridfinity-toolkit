@@ -152,7 +152,8 @@ def build(parent, app=None, state=None):
     w.tip(ttk.Radiobutton(vbar, text=T("2D grid"), value="2d", variable=view), view_tip).pack(side="left")
     w.tip(ttk.Radiobutton(vbar, text=T("3D view"), value="3d", variable=view), view_tip).pack(side="left", padx=10)
     dim_check = w.tip(ttk.Checkbutton(vbar, text=T("Grey out other levels"), variable=dim_levels),
-                      T("3D view: bins that do not start on the current level are grey, so lower levels are easier to see."))
+                      T("3D view: bins that do not start on the current level are grey and see-through, so you can see what is "
+                        "below them."))
     canvas = theme.canvas(right)
     view3d = View3D(right)
 

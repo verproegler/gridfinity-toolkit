@@ -475,8 +475,8 @@ DE = {
         'hält nicht: braucht Stapelränder an zwei gegenüberliegenden Seiten (links und rechts oder vorne und hinten)',
     'Grey out other levels':
         'Andere Ebenen ausgrauen',
-    '3D view: bins that do not start on the current level are grey, so lower levels are easier to see.':
-        '3D-Ansicht: Behälter, die nicht auf der aktuellen Ebene anfangen, sind grau – so sieht man untere Ebenen besser.',
+    '3D view: bins that do not start on the current level are grey and see-through, so you can see what is below them.':
+        '3D-Ansicht: Behälter, die nicht auf der aktuellen Ebene anfangen, sind grau und durchsichtig – so sieht man, was darunter liegt.',
     'no stacking surface below (needed: bins with stacking lip and top at {z} units under every cell)':
         'keine Stapelfläche darunter (nötig: unter jeder Zelle ein Behälter mit Stapelrand und Oberkante {z} HE)',
     'No valid split found.':

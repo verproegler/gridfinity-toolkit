@@ -37,13 +37,22 @@ class Scene:
         f = np.asarray(f, dtype=np.int64)
         self.v, self.f = v, f
         fc = np.tile(color, (len(f), 1)) if face_colors is None else np.asarray(face_colors, dtype=float)
-        self.face_colors = fc
+        # optional 4th column: opacity 0..1 (see-through faces are drawn after the solid ones)
+        alpha = fc[:, 3] if fc.shape[1] > 3 else np.ones(len(fc))
+        self.face_colors = fc[:, :3]   # the software fallback draws everything solid
         tri = v[f]
         n = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0])
         n = n / np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
+        rgba = np.column_stack([fc[:, :3] / 255.0, alpha])
+        solid = alpha >= 0.999
+        self.groups = []   # (positions, normals, RGBA colours, see-through)
+        for sel, clear in ((solid, False), (~solid, True)):
+            if sel.any():
+                self.groups.append((np.ascontiguousarray(tri[sel].reshape(-1, 3), dtype=np.float32),
+                                    np.ascontiguousarray(np.repeat(n[sel], 3, axis=0), dtype=np.float32),
+                                    np.ascontiguousarray(np.repeat(rgba[sel], 3, axis=0), dtype=np.float32),
+                                    clear))
         self.pos = np.ascontiguousarray(tri.reshape(-1, 3), dtype=np.float32)
-        self.nrm = np.ascontiguousarray(np.repeat(n, 3, axis=0), dtype=np.float32)
-        self.col = np.ascontiguousarray(np.repeat(fc / 255.0, 3, axis=0), dtype=np.float32)
         if lines is not None and len(lines):   # (m, 2, 3) segments, one colour per segment
             lines = np.asarray(lines, dtype=np.float64).reshape(-1, 2, 3)
             lc = np.tile([22, 163, 74], (len(lines), 1)) if line_colors is None else np.asarray(line_colors)
@@ -224,17 +233,26 @@ if HAVE_GL:
                 GL.glDeleteLists(self.dlist, 1)
             self.dlist = GL.glGenLists(1)
             GL.glNewList(self.dlist, GL.GL_COMPILE)
-            if len(s.pos):
+            # solid faces first; see-through faces afterwards, blended and without writing depth,
+            # so everything behind them (solid or see-through) stays visible
+            for pos, nrm, col, clear in s.groups:
+                if clear:
+                    GL.glEnable(GL.GL_BLEND)
+                    GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+                    GL.glDepthMask(GL.GL_FALSE)
                 GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
                 GL.glEnableClientState(GL.GL_NORMAL_ARRAY)
                 GL.glEnableClientState(GL.GL_COLOR_ARRAY)
-                GL.glVertexPointer(3, GL.GL_FLOAT, 0, s.pos)
-                GL.glNormalPointer(GL.GL_FLOAT, 0, s.nrm)
-                GL.glColorPointer(3, GL.GL_FLOAT, 0, s.col)
-                GL.glDrawArrays(GL.GL_TRIANGLES, 0, len(s.pos))
+                GL.glVertexPointer(3, GL.GL_FLOAT, 0, pos)
+                GL.glNormalPointer(GL.GL_FLOAT, 0, nrm)
+                GL.glColorPointer(4, GL.GL_FLOAT, 0, col)
+                GL.glDrawArrays(GL.GL_TRIANGLES, 0, len(pos))
                 GL.glDisableClientState(GL.GL_NORMAL_ARRAY)
                 GL.glDisableClientState(GL.GL_COLOR_ARRAY)
                 GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
+                if clear:
+                    GL.glDepthMask(GL.GL_TRUE)
+                    GL.glDisable(GL.GL_BLEND)
             if s.lpos is not None:
                 GL.glDisable(GL.GL_LIGHTING)
                 GL.glLineWidth(1.6)
